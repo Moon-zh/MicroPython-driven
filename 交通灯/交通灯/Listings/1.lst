@@ -1,0 +1,183 @@
+C51 COMPILER V9.00   1                                                                     03/28/2018 15:47:52 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE 1
+OBJECT MODULE PLACED IN .\Objects\1.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE 1.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\1.lst) 
+                    -OBJECT(.\Objects\1.obj)
+
+line level    source
+
+   1                  #include <reg52.h>
+   2                  #define u8 unsigned char
+   3                  #define u16 unsigned int
+   4                  #define smg P0
+   5                  #define e P2
+   6                  #define max_green 31
+   7                  
+   8                  sbit    red_nb=P3^0;
+   9                  sbit    yello_nb=P3^1;
+  10                  sbit    green_nb=P3^2;
+  11                  sbit    red_dx=P3^3;
+  12                  sbit    yello_dx=P3^4;
+  13                  sbit    green_dx=P3^5;
+  14                  sbit    dx_j=P1^0;
+  15                  sbit    nb_j=P1^1;
+  16                  
+  17                  u8 code tab[]={0xc0,0xf9,0xa4,0xb0,0x99,0x92,0x82,0xf8,0x80,0x90,0x88,0x83,0xc6,0xa1,0x86,0x8e};
+  18                  
+  19                  u8 led_nb,led_dx,ds[4],jsbz,cxbz,bz;
+  20                  
+  21                  void    delay(unsigned long a)
+  22                  {
+  23   1                      while(a--);
+  24   1              }
+  25                  
+  26                  void    dxtx()
+  27                  {
+  28   1                      green_dx=1;
+  29   1                      red_dx=0;
+  30   1                      yello_dx=0;
+  31   1                      
+  32   1                      green_nb=0;
+  33   1                      red_nb=1;
+  34   1                      yello_nb=0;
+  35   1              }
+  36                  
+  37                  void    nbtx()
+  38                  {
+  39   1                      green_dx=0;
+  40   1                      red_dx=1;
+  41   1                      yello_dx=0;
+  42   1                      
+  43   1                      green_nb=1;
+  44   1                      red_nb=0;
+  45   1                      yello_nb=0;
+  46   1              }
+  47                  
+  48                  void    dxh()
+  49                  {
+  50   1                      green_dx=0;
+  51   1                      red_dx=0;
+  52   1                      yello_dx=1;
+  53   1              }
+  54                  
+C51 COMPILER V9.00   1                                                                     03/28/2018 15:47:52 PAGE 2   
+
+  55                  void    nbh()
+  56                  {
+  57   1                      green_nb=0;
+  58   1                      red_nb=0;
+  59   1                      yello_nb=1;
+  60   1              }
+  61                  
+  62                  void    smxs()
+  63                  {
+  64   1                      u8 i=0;
+  65   1                      ds[0]=led_nb/10;
+  66   1                      ds[1]=led_nb%10;
+  67   1                      ds[2]=led_dx/10;
+  68   1                      ds[3]=led_dx%10;
+  69   1                      for(P2=1;P2!=0x10;P2<<=1)
+  70   1                      {
+  71   2                              smg=tab[ds[i++]];
+  72   2                              delay(20);
+  73   2                              smg=0xff;
+  74   2                      }
+  75   1              }
+  76                  
+  77                  void    zdsz()
+  78                  {
+  79   1                      TMOD=0X11;
+  80   1                      TH0=0X3C;
+  81   1                      TL0=0XB0;
+  82   1                      ET0=TR0=ET1=TR1=EA=1;
+  83   1              }
+  84                  
+  85                  void    init()
+  86                  {
+  87   1                      led_dx=max_green;
+  88   1                      led_nb=max_green+3;
+  89   1                      jsbz=0;
+  90   1                      cxbz=0;
+  91   1              }
+  92                  
+  93                  void    main()
+  94                  {
+  95   1                      init();
+  96   1                      zdsz();
+  97   1                      while(1)
+  98   1                      {
+  99   2                              switch(cxbz)
+ 100   2                              {
+ 101   3                                      case 0:
+ 102   3                                                      dxtx();break;
+ 103   3                                      case 1:
+ 104   3                                                      dxh();break;
+ 105   3                                      case 2:
+ 106   3                                                      nbtx();break;
+ 107   3                                      case 3:
+ 108   3                                                      nbh();break;
+ 109   3                                      case 4:
+ 110   3                                                      init();
+ 111   3                              }
+ 112   2                              smxs();
+ 113   2                      }
+ 114   1              }
+ 115                  
+ 116                  void    zd() interrupt 1
+C51 COMPILER V9.00   1                                                                     03/28/2018 15:47:52 PAGE 3   
+
+ 117                  {
+ 118   1                      TH0=0X3C;
+ 119   1                      TL0=0XB0;
+ 120   1                      
+ 121   1                      if(++jsbz==20)
+ 122   1                      {
+ 123   2                              jsbz=0;
+ 124   2                              if(--led_dx==0)
+ 125   2                              {
+ 126   3                                      if(cxbz==0)led_dx=3,cxbz++;
+ 127   3                                      else if(cxbz==1)led_dx=max_green+3,led_nb=max_green,cxbz++;
+ 128   3                                      else led_dx=max_green,cxbz=0;
+ 129   3                              }
+ 130   2                              if(--led_nb==0)
+ 131   2                              {
+ 132   3                                      if(cxbz==2)led_nb=3,cxbz++;
+ 133   3                                      else if(cxbz==3)led_nb=max_green+3,led_dx=max_green,cxbz=0;
+ 134   3                                      else led_nb=max_green,cxbz=0;
+ 135   3                              }
+ 136   2                      }
+ 137   1              }
+ 138                  
+ 139                  void    zd_j() interrupt 3
+ 140                  {
+ 141   1                      if(!dx_j)
+ 142   1                      {
+ 143   2                              TR0=0,smg=0xff;
+ 144   2                              dxtx();
+ 145   2                              while(!dx_j);
+ 146   2                              TR0=1;
+ 147   2                      }
+ 148   1                      if(!nb_j)
+ 149   1                      {
+ 150   2                              TR0=0,smg=0xff;
+ 151   2                              nbtx();
+ 152   2                              while(!nb_j);
+ 153   2                              TR0=1;
+ 154   2                      }
+ 155   1              }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    355    ----
+   CONSTANT SIZE    =     16    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      9       4
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

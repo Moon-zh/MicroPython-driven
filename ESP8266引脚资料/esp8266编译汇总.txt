@@ -1,0 +1,117 @@
+
+esp8266 编译相关
+============================================================
+
+
+参考网址
+
+==========================
+
+https://github.com/pfalcon/esp-open-sdk
+
+https://github.com/micropython/micropython
+
+-->:
+
+Ubuntu 14.04:
+
+$ sudo apt-get install make unrar-free autoconf automake libtool gcc g++ gperf \
+    flex bison texinfo gawk ncurses-dev libexpat-dev python-dev python python-serial \
+    sed git unzip bash help2man wget bzip2
+
+Later Debian/Ubuntu versions may require:
+
+$ sudo apt-get install libtool-bin
+
+-->:root 用户操作
+
+-->:git clone --recursive https://github.com/pfalcon/esp-open-sdk.git
+
+-->:需要修改SDK版本话，可编辑esp-open-sdk/Makefile 修改
+
+------------------------------------------------------>
+make[2]: Entering directory '/home/esp-open-sdk/crosstool-NG'
+[ERROR]  You must NOT be root to run crosstool-NG
+
+<-----------------------------------------------------
+
+-->:chmod -R 777 /esp-open-sdk
+
+-->:su xxx 切换到普通用户操作
+
+-->:make STANDALONE=y
+
+
+-->:git clone --recursive https://github.com/micropython/micropython.git
+
+-->:cd micropython/
+
+-->:git submodule update --init
+
+-->:make -C mpy-cross
+
+-->:cd esp8266/
+
+-->:make axtls
+
+-->:make
+
+
+LINK build/firmware.elf
+   text	   data	    bss	    dec	    hex	filename
+ 574596	   1080	  64352	 640028	  9c41c	build/firmware.elf
+Create build/firmware-combined.bin
+esptool.py v1.2
+('flash    ', 35600)
+('padding  ', 1264)
+('irom0text', 540120)
+('total    ', 576984)
+('md5      ', '92c8a3907df8f8e4da5dd83c5fcf50d1')
+
+
+错误总结
+===================================================
+
+Q1:[ERROR]  You must NOT be root to run crosstool-NG
+
+A1:先用root用户把权限改成777，然后再使用普通用户进行编译。
+
+--------------------------------------------------------------
+Q2: xtensa-lx106-elf-gcc: not found
+
+A2:
+
+Xtensa toolchain is built, to use it:
+
+
+(把xtensa-lx106-elf加入到环境变量中)
+
+当前终端有效：
+
+export PATH=/home/esp-open-sdk/xtensa-lx106-elf/bin:$PATH 
+
+永久有效：
+
+vi /etc/profile 将上面一句添加到最后。注销生效
+
+--------------------------------------------------------------
+
+Q3：
+------------------------------------------------------>
+
+lwip/app/dhcpserver.c: In function 'wifi_softap_init_dhcps_lease':
+lwip/app/dhcpserver.c:846:17: error: 'struct dhcps_lease' has no member named 'enable'
+
+<-----------------------------------------------------
+
+A3：sdk 1.3 和1.4存在这样的问题，替换\ esp_iot_sdk_v1.4.0 \ include \ user_interface.h 文件
+
+文件详见同目录
+
+参考地址：http://bbs.espressif.com/viewtopic.php?t=1215
+http://bbs.espressif.com/viewtopic.php?f=46&t=1221
+
+
+Q4:解决Scan时channel和rssid错误的问题
+
+A4:使用arduino中的user_interface.h 覆盖/esp_iot_sdk_v1.3.0/include/下

@@ -1,0 +1,47 @@
+from pyb import Pin
+import time
+
+def stepping(a,b,c,d,dir,speed):
+	cp1=Pin(a,Pin.OUT_PP)
+	cp2=Pin(b,Pin.OUT_PP)
+	cp3=Pin(c,Pin.OUT_PP)
+	cp4=Pin(d,Pin.OUT_PP)
+	if dir:
+		cp1.value(0)
+		cp4.value(1)
+		time.sleep_ms(speed)
+		cp2.value(0)
+		time.sleep_ms(speed)
+		cp1.value(1)
+		time.sleep_ms(speed)
+		cp3.value(0)
+		time.sleep_ms(speed)
+		cp2.value(1)
+		time.sleep_ms(speed)
+		cp4.value(0)
+		time.sleep_ms(speed)
+		cp3.value(1)
+		time.sleep_ms(speed)
+		cp1.value(0)
+		time.sleep_ms(speed)
+	else :
+		cp4.value(0)
+		cp1.value(1)
+		time.sleep_ms(speed)
+		cp3.value(0)
+		time.sleep_ms(speed)
+		cp4.value(1)
+		time.sleep_ms(speed)
+		cp2.value(0)
+		time.sleep_ms(speed)
+		cp3.value(1)
+		time.sleep_ms(speed)
+		cp1.value(0)
+		time.sleep_ms(speed)
+		cp2.value(1)
+		time.sleep_ms(speed)
+		cp4.value(0)
+		time.sleep_ms(speed)
+
+while True:
+	stepping('X1','X2','X3','X4',0,2)

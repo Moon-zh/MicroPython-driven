@@ -1,0 +1,8 @@
+RS	Y2
+E	Y1
+D0-D7	X1-X7
+VCC	5V
+RW	GND	读取控制引脚
+PSB	5V	串并选择引脚
+BLA	5V
+BLK	GND
